@@ -1,0 +1,81 @@
+* {
+            font-family: '프롬프트', sans-serif;
+        }
+        .mytop {
+            width: 100%;
+            height: 150px;
+
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+            background-position: center 100%;
+            background-size: auto;
+
+            color: white;
+
+        }
+        .fit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+
+        }
+        .log {
+            display: flex;
+            justify-content: flex-end;
+            padding: 5px 20px 0px 0px;
+
+            text-decoration-line: none;
+            text-underline: none;
+            color: white;
+            font-size: 1.3em;
+        }
+        .mystop {
+            width: 100%;
+            height: 500px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            /*background: #EF3B36;  !* fallback for old browsers *!*/
+            /*background: -webkit-linear-gradient(to left, #FFFFFF, #EF3B36);  !* Chrome 10-25, Safari 5.1-6 *!*/
+            /*background: linear-gradient(to left, #FFFFFF, #EF3B36); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
+        }
+        .ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            align-items: center;
+
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            text-decoration-line: none;
+            text-underline: none;
+            color: white;
+            font-size: 1.3em;
+        }
+        .heart {
+            display: flex;
+            justify-content: flex-end;
+
+            padding: 0px 300px 0px 0px;
+
+            color: white;
+            font-size: 1em;
+        }
+        .form-control {
+            width: 100%;
+            height: 100px;
+
+            font-size: 1.2em;
+            text-align: center;
+
+        }

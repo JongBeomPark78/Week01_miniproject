@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <title>⚽WorldCup</title>
+    <link rel="stylesheet" type="text/css" href="../static/total.css">
+    <link href="https: //fonts.googleapis.com/css2? family= Nunito:wght@200 & family= Prompt:ital@1 & display=swap" rel="stylesheet">
+    <style>
+    </style>
+    <script>
+        $(document).ready(function () {
+            show_comment();
+        })
+        function show_comment(){
+            $.ajax({
+                type: "GET",
+                url: "/comment",
+                data: {},
+                success: function (response) {
+                    let rows = response['comments']
+                    for (let i = 0; i < rows.length; i++) {
+                        let comment = rows[i]['comment']
+                        let num = rows[i]['num']
+                        let done = rows[i]['done']
+
+                        let temp_html = ``
+
+                        if (done === 0) {
+                            temp_html = `<div style="display: flex;
+                                                        flex-direction: row;
+                                                        align-items: center;
+                                                        justify-content: center;">
+                                            <h1>ID:</h1>
+                                            <h1>${comment}</h1>
+                                            <button onclick="delete_comment(${num})" type="button" class="btn btn-outline-dark">삭제</button>
+                                        </div>`
+                        } else {
+                            temp_html = `<ul>
+                                            <h2 class="done">${comment}</h2>
+                                        </ul>`
+                        }
+                        $('#comment-list').append(temp_html)
+                    }
+
+                }
+            });
+        }
+
+        function save_comment(){
+            let comment = $('#comment').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/comment",
+                data: {comment_give:comment},
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            });
+        }
+      
+        function delete_comment(num) {
+            $.ajax({
+                type: "POST",
+                url: "/comment/delete",
+                data: {num_give: num},
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <div class="mytop">
+        <a href="/login"class="log">Login</a>
+        <h1 class="fit">⚽ 2022 카타르 월드컵 화이팅!!</h1>
+    <div>
+        <a href="/cheer"class="info">🇰🇷선수단 정보</a>
+        </div>
+    <div>
+        <h1 class="heart">💕좋아요 : </h1>
+        </div>
+    </div>
+    <div class="mystop" id="comment-list">
+
+    </div>
+    <div>
+        <div class="input-group mb-3" id="post-box">
+            <input id="comment" class="form-control" placeholder="응원 메시지를 남겨주세요" aria-label="Recipient's username" aria-describedby="button-addon2">
+            <button onclick="save_comment()" type="button" id="button-addon2">응원하기</button>
+        </div>
+    </div>
+
+</body>
+</html>
