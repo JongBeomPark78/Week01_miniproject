@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <!-- Webpage Title -->
+        <title>Hello, world!</title>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bulma CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+        <script>
+            function login() {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/login",
+                    data: {id_give: $('#userid').val(), pw_give: $('#userpw').val()},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            $.cookie('mytoken', response['token']);
+                            alert('로그인 완료!')
+                            window.location.href = '/'
+                        } else {
+                            alert(response['msg'])
+                        }
+                    }
+                })
+            }
+
+            function id_confirm(asValue) {
+                let emailAddress = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/;
+	            return emailAddress.test(asValue);
+            }
+
+            //ID 중복확인
+            function id_overlap() {
+                let userid = $('#userid_register').val()
+
+                $.ajax({
+                    type: "GET",
+                    url: "/api/id_overlap",
+                    data: {},
+                    success: function (response) {
+                        let rows = response['emails']
+                        // console.log('rows : ',rows)
+                        if (rows.length == 0) {
+                            alert('저장된 데이터가 없습니다. 이메일 형식으로 ID를 만들어주세요.')
+                        }
+                        for (let i = 0; i < rows.length; i++) {
+                            let email = rows[i]['id']
+                            if (userid == email) {
+                                alert('중복된 ID 입니다')
+                                return
+                            } else if (userid == '' || !id_confirm(userid)) {
+                                alert('사용 불가능한 ID 입니다. 올바른 이메일 형식으로 입력해 주세요')
+                                return
+                            } else {
+                                alert('사용 가능한 ID 입니다')
+                                return;
+                            }
+                        }
+
+                    }
+                })
+            }
+
+            //NICKNAME 중복확인
+            function nick_overlap() {
+                let usernick = $('#usernick').val()
+
+                $.ajax({
+                    type: "GET",
+                    url: "/api/nick_overlap",
+                    data: {},
+                    success: function (response) {
+                        let rows = response['nicks']
+                        if (rows.length == 0) {
+                            alert('저장된 데이터가 없습니다. 닉네임을 만들어주세요.')
+                        }
+                        for (let i = 0; i < rows.length; i++) {
+                            let nickName = rows[i]['nick']
+                            if (usernick == nickName) {
+                                alert('중복된 닉네임 입니다')
+                                return
+                            } else if (usernick == '') {
+                                alert('사용 불가능한 닉네임 입니다')
+                                return;
+                            } else {
+                                alert('사용 가능한 닉네임 입니다')
+                                return;
+                            }
+                        }
+
+                    }
+                })
+            }
+
+
+            function register() {
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/register",
+                        data: {
+                            id_give: $('#userid_register').val(),
+                            pw_give: $('#userpw_register').val(),
+                            nickname_give: $('#usernick').val()
+                        },
+                        success: function (response) {
+                            if (response['result'] == 'success') {
+                                alert('회원가입이 완료되었습니다.')
+                                window.location.href = '/login'
+                            } else {
+                                alert(response['msg'])
+                            }
+                        }
+                    })
+                }
+
+
+
+                function init() {
+                    $('#userid').val('')
+                    $('#userpw').val('')
+                }
+
+                function init_register() {
+                    $('#userid_register').val('')
+                    $('#userpw_register').val('')
+                    $('#usernick').val('')
+                }
+
+
+        </script>
+
+
+
+    </head>
+    <body>
+<!--   modal1    -->
+    <div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel"
+         tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalToggleLabel">로그인</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="section has-text-centered">
+                        <h1 class="title">로그인 페이지</h1>
+                        <div class="container" style="width:60%">
+                            <div class="field is-horizontal">
+                                <div class="field-label is-normal">
+                                    <label class="label" for="userid">ID</label>
+                                </div>
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="text" class="input" id="userid" aria-describedby="emailHelp"
+                                                   placeholder="My ID">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field is-horizontal">
+                                <div class="field-label is-normal">
+                                    <label class="label" for="userpw">PW</label>
+                                </div>
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="password" class="input" id="userpw" placeholder="My Password">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="button is-primary" onclick="login()">로그인</button>
+                            <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal" onclick="init()">회원가입
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="init()">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--  modal2   -->
+    <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2"
+         tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">회원가입</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="section has-text-centered">
+                        <h1 class="title">회원가입 페이지</h1>
+                        <div class="container" style="width:60%">
+                            <div class="field is-horizontal">
+                                <div class="field-label is-normal">
+                                    <label class="label" for="userid">ID</label>
+                                </div>
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="text" class="input" id="userid_register" aria-describedby="emailHelp"
+                                                   placeholder="My ID">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-button">
+                                    <button type="button" class="button is-primary"
+                                                style=" margin-left: 10px; --bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem; margin-top: 10px" onclick="id_overlap()">ID 확인</button>
+                                </div>
+                            </div>
+                            <div class="field is-horizontal">
+                                <div class="field-label is-normal">
+                                    <label class="label" for="userpw">PW</label>
+                                </div>
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="password" class="input" id="userpw_register" placeholder="My Password">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field is-horizontal">
+                                <div class="field-label is-normal">
+                                    <label class="label" for="usernick">NICKNAME</label>
+                                </div>
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="text" class="input" id="usernick" placeholder="My Nickname">
+                                            <button type="button" class="button is-primary"
+                                                style=" margin-left: 10px; --bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem; margin-top: 10px" onclick="nick_overlap()">닉네임 확인</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="button is-primary" onclick="register()">회원가입</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal" data-bs-dismiss="modal" onclick="init_register()">로그인 페이지로
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-primary" data-bs-toggle="modal" href="#exampleModalToggle" role="button">login</a>
+
+    </body>
+</html>
