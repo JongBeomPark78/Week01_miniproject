@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>⚽WorldCup</title>
+    <link rel="stylesheet" type="text/css" href="../static/total.css">
+    <link href="https: //fonts.googleapis.com/css2? family= Nunito:wght@200 & family= Prompt:ital@1 & display=swap"
+          rel="stylesheet">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            font-family: '프롬프트', sans-serif;
+        }
+
+        .mytop {
+            width: auto;
+
+            height: 200px;
+
+            background-image: url("https://newsimg.sedaily.com/2020/11/27/1ZAKL50VRF_2.jpg");
+            background-size: 100% 200px;
+
+            color: white;
+        }
+
+        .mytop > div > a:hover {
+            color: yellow;
+        }
+
+        .mytop > div > div > a:hover {
+            color: gainsboro;
+
+        }
+
+        .fit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .log {
+            padding: 5px 20px 0px 0px;
+
+            text-decoration-line: none;
+            text-underline: none;
+            color: white;
+            font-size: 1.3em;
+        }
+
+        .mystop {
+            width: 800px;
+            height: 100%;
+            margin-right: auto;
+            margin-left: auto;
+
+
+            border-bottom-right-radius: 20px;
+            border-bottom-left-radius: 20px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+
+            /*background: #EF3B36;  !* fallback for old browsers *!*/
+            /*background: -webkit-linear-gradient(to left, #FFFFFF, #EF3B36);  !* Chrome 10-25, Safari 5.1-6 *!*/
+            /*background: linear-gradient(to left, #FFFFFF, #EF3B36); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
+        }
+
+        .info {
+            text-decoration-line: none;
+            text-underline: none;
+            color: white;
+            font-size: 1.5em;
+            border-radius: 15px;
+            border: 0.5px solid white;
+            background: linear-gradient(350deg, #3498db 50%, crimson 50%);
+            top: 50%;
+            left: 50%;
+            content: attr(data-split);
+            font-weight: 520;
+
+        }
+
+        .info:hover {
+            box-shadow: 0px 0px 10px 0px black;
+
+        }
+
+
+        .heart {
+            display: flex;
+            justify-content: center;
+
+
+            color: white;
+            font-size: 1em;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 70px;
+
+            border-radius: 20px;
+
+            font-size: 1.2em;
+            text-align: center;
+
+        }
+
+        .winning_rate1 {
+            background-color: ivory;
+            border-radius: 3%;
+            box-shadow: 0px 0px 5px 0px black;
+            width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .comment_write {
+
+            margin-left: auto;
+            margin-right: auto;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            winning_rate();
+            show_comment();
+            login_check();
+        })
+
+        function show_comment() {
+
+            $.ajax({
+                type: "GET",
+                url: "/comment",
+                data: {},
+                success: function (response) {
+
+                    let rows = response['comments']
+                    for (let i = 0; i < rows.length; i++) {
+                        let comment = rows[i]['comment']
+                        let num = rows[i]['num']
+                        let done = rows[i]['done']
+
+                        let temp_html = ``
+
+                        if (done === 0) {
+                            temp_html = `<div style="display: flex;
+                                                        flex-direction: row;
+                                                        align-items: center;
+                                                        justify-content: center;">
+                                            <h1>ID:</h1>
+                                            <h1>${comment}</h1>
+                                            <button onclick="delete_comment(${num})" type="button" class="btn btn-outline-dark">삭제</button>
+                                        </div>`
+                        } else {
+                            temp_html = `<ul>
+                                            <h2 class="done">${comment}</h2>
+                                        </ul>`
+                        }
+                        $('#comment-list').append(temp_html)
+                    }
+
+                }
+            });
+        }
+
+        function save_comment() {
+            let comment = $('#comment').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/comment",
+                data: {comment_give: comment},
+                success: function (response) {
+                    alert(response['msg'])
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    } else {
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+
+
+        function delete_comment(num) {
+            $.ajax({
+                type: "POST",
+                url: "/comment/delete",
+                data: {num_give: num},
+                success: function (response) {
+                    alert(response["msg"])
+                    window.location.reload()
+                }
+            })
+        }
+
+        function login() {
+            $.ajax({
+                type: "POST",
+                url: "/api/login",
+                data: {id_give: $('#userid').val(), pw_give: $('#userpw').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        // 로그인이 정상적으로 되면, 토큰을 받아옵니다.
+                        // 이 토큰을 mytoken이라는 키 값으로 쿠키에 저장합니다.
+
+                        //j쿼리식
+                        $.cookie('mytoken', response['token']);
+                        //js문법식
+                        // document.cookie = 'mytoken=' + response['token'] + ';path=/';
+                        console.log(document.cookie);
+
+                        alert('로그인 완료!')
+                        window.location.href = '/'
+                    } else {
+                        // 로그인이 안되면 에러메시지를 띄웁니다.
+                        alert(response['msg'])
+                    }
+                }
+            })
+        }
+
+        function login_check() {
+            $.ajax({
+                type: "POST",
+                url: "/login_check",
+                data: {id_give: $('#userid').val(), pw_give: $('#userpw').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        $("#modal_btn").fadeOut();
+                        $("#Logout").fadeIn();
+                    }
+                }
+            })
+        }
+
+        function logout() {
+            $.removeCookie('mytoken');
+            alert('로그아웃!')
+            $("#modal_btn").fadeIn();
+            $("#Logout").fadeOut();
+        }
+
+        function empty_1() {
+            $('#userid_register').val('')
+            $('#userpw_register').val('')
+            $('#usernick').val('')
+        }
+
+        // 간단한 회원가입 함수입니다.
+        // 아이디, 비밀번호, 닉네임을 받아 DB에 저장합니다.
+        function register() {
+            if ($('#userid_register').val().length === 0) {
+                alert("ID를 입력하세요!")
+            } else if ($('#userpw_register').val().length === 0) {
+                alert("PW를 입력하세요!")
+            } else if ($('#usernick').val().length === 0) {
+                alert("닉네임을 입력하세요!")
+            } else {
+                let id_register = $('#userid_register').val()
+                let pw_register = $('#userpw_register').val()
+                let nick = $('#usernick').val()
+                $('#userid_register').val('')
+                $('#userpw_register').val('')
+                $('#usernick').val('')
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/register",
+                    data: {
+                        id_give: id_register,
+                        pw_give: pw_register,
+                        nickname_give: nick
+                    },
+                    success: function (response) {
+                        if (response['result'] === 'success') {
+                            alert('회원가입이 완료되었습니다.')
+                        } else {
+                            alert(response['msg'])
+                        }
+                    }
+                })
+            }
+        }
+
+        function winning_rate() {
+            $('#count12').empty()
+            $.ajax({
+                type: "GET",
+                url: "/winning_rate",
+                data: {},
+                success: function (response) {
+                    console.log(response['winning_rate'])
+                    let rows = response['winning_rate']
+                    for (let i = 0; i < rows.length; i++) {
+                        let korea_image = rows[i]['korea_image'];
+                        let country_name = rows[i]['country_name'];
+                        let country = rows[i]['country'];
+                        let korea = rows[i]['korea'];
+                        let drow = rows[i]['drow'];
+                        let country_image = rows[i]['country_image'];
+                        let korea_value = rows[i]['winning_rate_count_korea'];
+                        let country_value = rows[i]['winning_rate_count_country']
+                        let drow_value = rows[i]['drow_count']
+                        let country_num = rows[i]['country_num']
+                        let max_value = korea_value + country_value + drow_value;
+                        let korea_persent = korea_value / max_value * 100;
+                        let country_persent = country_value / max_value * 100;
+                        let drow_persent = drow_value / max_value * 100;
+
+                        let temp_coumt = `<div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin-top: 10px;margin-bottom: 10px">
+                                            <div style="display: flex; flex-direction: column;">
+                                                <img src="${korea_image}">
+                                                <button onclick="increase_korea(${korea},${country_num})" type="button" class="btn btn-primary">korea</button>
+                                            </div>
+                                            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                <div class="progress" style="height: 20px; width: 200px">
+                                                  <div  class="progress-bar progress-bar-striped" role="progressbar" style="width: ${parseInt(korea_persent)}%" aria-valuenow="${korea_value}" aria-valuemin="0" aria-valuemax="${max_value}">${parseInt(korea_persent)}%</div>
+                                                  <div  class="progress-bar progress-bar-striped bg-success" role="progressbar" style=" width: ${parseInt(drow_persent)}%" aria-valuenow="${drow_value}" aria-valuemin="0" aria-valuemax="${max_value}">${parseInt(drow_persent)}%</div>
+                                                  <div  class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: ${parseInt(country_persent)}%" aria-valuenow="${country_value}" aria-valuemin="0" aria-valuemax="${max_value}">${parseInt(country_persent)}%</div>
+                                                </div>
+                                                <button type="button" onclick="increase_drow(${drow},${country_num})" class="btn btn-success">Drow</button>
+                                            </div>
+                                            <div style="display: flex; flex-direction: column;">
+                                                <img src="${country_image}">
+                                                <button type="button" onclick="increase_country(${country},${country_num})" class="btn btn-danger">${country_name}</button>
+                                            </div>
+                                        </div>`
+
+                        $('#winning_rate').append(temp_coumt);
+                    }
+                }
+            })
+        }
+
+        function increase_korea(korea, country_num) {
+
+            console.log(korea, country_num)
+            $.ajax({
+                type: "POST",
+                url: "/winning_rate/increase",
+                data: {'korea_give': korea, 'country_num_give': country_num, 'drow_give': 0, 'country_give': 0},
+                success: function (response) {
+                    alert(response['msg'])
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    }
+                },
+            });
+        }
+
+        function increase_drow(drow, country_num) {
+            $.ajax({
+                type: "POST",
+                url: "/winning_rate/increase",
+                data: {'drow_give': drow, 'country_num_give': country_num, 'korea_give': 0, 'country_give': 0},
+                success: function (response) {
+                    alert(response['msg'])
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    }
+
+                },
+            });
+        }
+
+        function increase_country(country, country_num) {
+            $.ajax({
+                type: "POST",
+                url: "/winning_rate/increase",
+                data: {'country_give': country, 'country_num_give': country_num, 'korea_give': 0, 'drow_give': 0},
+                success: function (response) {
+                    alert(response['msg'])
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    }
+                },
+            });
+        }
+
+
+    </script>
+</head>
+<body>
+<!--//탑 부분-->
+<div class="mytop">
+
+    <div style="height: 30px;display: flex; flex-direction: column;align-items: end;justify-content: end;">
+        <a class="log" data-bs-toggle="modal" href="#exampleModalToggle" id="modal_btn" role="button"
+           style="display: flex; position: absolute;">Login</a>
+        <a onclick="logout()" class="log" data-bs-toggle="modal" href="#exampleModalToggle" id="Logout" role="button"
+           style="display: none; position: absolute;">Logout</a>
+    </div>
+    <div style="display: flex;flex-direction: column; align-items: center;justify-content: center;">
+        <div>
+            <a href="/cheer" type="button" class="info">KR선수단 정보</a>
+        </div>
+    </div>
+    <h1 class="fit">⚽ 2022 카타르 월드컵 화이팅!!</h1>
+    <div style="margin-top: 50px">
+        <h1 class="heart">💕좋아요 : </h1>
+    </div>
+</div>
+<!--//경기 승률-->
+<div class="winning_rate1">
+    <div style="color:gray;font-size: x-large;border-bottom: 1px solid gray; margin-bottom: 10px">경기결과 투표해보기</div>
+
+    <div id="winning_rate">
+
+    </div>
+</div>
+
+<!--//코멘트-->
+<div class="mystop" id="comment-list">
+
+</div>
+<!--//코멘트작성-->
+<div class="comment_write">
+    <div style="width: 800px;">
+        <div class="input-group mb-3" id="post-box">
+            <input id="comment" class="form-control" placeholder="응원 메시지를 남겨주세요" aria-label="Recipient's username"
+                   aria-describedby="button-addon2">
+            <button style="border-bottom-right-radius: 20px;border-top-right-radius: 20px" onclick="save_comment()"
+                    type="button" id="button-addon2" class="btn btn-outline-dark">응원하기
+            </button>
+        </div>
+    </div>
+</div>
+<!--로그인, 회원가입-->
+<!-- Modal1 -->
+<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel"
+     tabindex="-1">
+    <!-- Scrollable modal -->
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">로그인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="section has-text-centered">
+                    <h1 class="title">로그인 페이지</h1>
+                    <div class="container" style="width:60%">
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userid">ID</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" class="input" id="userid" aria-describedby="emailHelp"
+                                               placeholder="My ID">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userpw">PW</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="password" class="input" id="userpw" placeholder="My Password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="button is-primary"
+                                data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
+                                data-bs-dismiss="modal">회원가입
+                        </button>
+                        <button style="margin-left: 40px" class="button is-primary" onclick="login()">로그인</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal2 -->
+<div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">회원가입</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="section has-text-centered">
+                    <h1 class="title">회원가입 페이지</h1>
+                    <div class="container" style="width:60%">
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userid">ID</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" class="input" id="userid_register"
+                                               aria-describedby="emailHelp"
+                                               placeholder="My ID">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userpw">PW</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="password" class="input" id="userpw_register"
+                                               placeholder="My Password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="usernick">NICKNAME</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" class="input" id="usernick" placeholder="My Nickname">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="button is-primary" onclick="register()" data-bs-target="#exampleModalToggle"
+                                data-bs-toggle="modal"
+                                data-bs-dismiss="modal">회원가입
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal"
+                        data-bs-dismiss="modal" onclick="empty_1()" type="button">로그인으로 돌아가기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
