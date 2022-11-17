@@ -38,9 +38,16 @@
                 })
             }
 
+            //ID 이메일 정규식
             function id_confirm(asValue) {
-                let emailAddress = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/;
-	            return emailAddress.test(asValue);
+                let emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/;
+	            return emailRegExp.test(asValue);
+            }
+
+            //비밀번호 숫자/문자/특수문자 조합 8~15자 암호정규식
+            function password_confirm(asValue) {
+                 let pwRegExp = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+                 return pwRegExp.test(asValue);
             }
 
             //ID 중복확인
@@ -55,16 +62,22 @@
                         let rows = response['emails']
                         // console.log('rows : ',rows)
                         if (rows.length == 0) {
-                            alert('저장된 데이터가 없습니다. 이메일 형식으로 ID를 만들어주세요.')
+                            if (userid == '' || !id_confirm(userid)) {
+                                alert('올바른 이메일 형식으로 입력해주세요')
+                                $('#userid_register').focus()
+                                return false
+                            } else {
+                                alert('사용가능한 ID 입니다')
+                            }
                         }
                         for (let i = 0; i < rows.length; i++) {
                             let email = rows[i]['id']
                             if (userid == email) {
                                 alert('중복된 ID 입니다')
-                                return
+                                return;
                             } else if (userid == '' || !id_confirm(userid)) {
                                 alert('사용 불가능한 ID 입니다. 올바른 이메일 형식으로 입력해 주세요')
-                                return
+                                return;
                             } else {
                                 alert('사용 가능한 ID 입니다')
                                 return;
@@ -74,6 +87,7 @@
                     }
                 })
             }
+
 
             //NICKNAME 중복확인
             function nick_overlap() {
@@ -86,13 +100,19 @@
                     success: function (response) {
                         let rows = response['nicks']
                         if (rows.length == 0) {
-                            alert('저장된 데이터가 없습니다. 닉네임을 만들어주세요.')
+                            if (usernick == '') {
+                                alert('닉네임을 입력해주세요')
+                                $('#usernick').focus()
+                                return false
+                            } else {
+                                alert('사용가능한 닉네임 입니다')
+                            }
                         }
                         for (let i = 0; i < rows.length; i++) {
                             let nickName = rows[i]['nick']
                             if (usernick == nickName) {
                                 alert('중복된 닉네임 입니다')
-                                return
+                                return;
                             } else if (usernick == '') {
                                 alert('사용 불가능한 닉네임 입니다')
                                 return;
@@ -106,17 +126,38 @@
                 })
             }
 
-
+            //회원가입
             function register() {
+                let id = $('#userid_register').val()
+                let pw = $('#userpw_register').val()
+                let nick = $('#usernick').val()
 
+                //회원가입 버튼 누를때 조건에 맞지 않으면 false 값 리턴
+                if (id == '' || !id_confirm(id)) {
+                    alert('올바른 이메일 형식으로 입력해주세요')
+                    $('#userid_register').focus()
+                    return false
+                }
+
+                if (pw == '' || !password_confirm(pw)) {
+                    alert('비밀번호를 입력해주세요. 숫자 문자 특수문자 조합 8~15자리')
+                    $('#userpw_register').focus()
+                    return false
+                }
+
+                if (nick == '') {
+                    alert('닉네임을 입력해주세요')
+                    $('#usernick').focus()
+                    return false
+                }
 
                     $.ajax({
                         type: "POST",
                         url: "/api/register",
                         data: {
-                            id_give: $('#userid_register').val(),
-                            pw_give: $('#userpw_register').val(),
-                            nickname_give: $('#usernick').val()
+                            id_give: id,
+                            pw_give: pw,
+                            nickname_give: nick
                         },
                         success: function (response) {
                             if (response['result'] == 'success') {
@@ -221,7 +262,7 @@
                                     <div class="field">
                                         <div class="control">
                                             <input type="text" class="input" id="userid_register" aria-describedby="emailHelp"
-                                                   placeholder="My ID">
+                                                   placeholder="이메일 형식으로 입력해주세요">
                                         </div>
                                     </div>
                                 </div>
@@ -237,7 +278,7 @@
                                 <div class="field-body">
                                     <div class="field">
                                         <div class="control">
-                                            <input type="password" class="input" id="userpw_register" placeholder="My Password">
+                                            <input type="password" class="input" id="userpw_register" placeholder="숫자 문자 특수문자 조합 8~15자리">
                                         </div>
                                     </div>
                                 </div>
