@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>⚽WorldCup</title>
+
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            font-family: '프롬프트', sans-serif;
+        }
+
+        .mytop {
+            width: auto;
+
+            height: 200px;
+
+            background-image: url("https://newsimg.sedaily.com/2020/11/27/1ZAKL50VRF_2.jpg");
+            background-size: 100% 200px;
+
+            color: white;
+        }
+
+        .mytop > div > a:hover {
+            color: yellow;
+        }
+
+        .mytop > div > div > a:hover {
+            color: gainsboro;
+        }
+
+        .fit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 600;
+        }
+
+        .log {
+            padding: 5px 20px 0px 0px;
+
+            text-decoration-line: none;
+            text-underline: none;
+            color: white;
+            font-size: 1.3em;
+        }
+
+        .mystop {
+            width: 800px;
+            height: 100%;
+            margin-right: auto;
+            margin-left: auto;
+
+
+            /*background: #EF3B36;  !* fallback for old browsers *!*/
+            /*background: -webkit-linear-gradient(to left, #FFFFFF, #EF3B36);  !* Chrome 10-25, Safari 5.1-6 *!*/
+            /*background: linear-gradient(to left, #FFFFFF, #EF3B36); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
+        }
+
+        .info {
+            text-decoration-line: none;
+            text-underline: none;
+            color: white;
+            font-size: 1.5em;
+            border-radius: 15px;
+            border: 0.5px solid white;
+            background: linear-gradient(350deg, #3498db 50%, crimson 50%);
+            top: 50%;
+            left: 50%;
+            content: attr(data-split);
+            font-weight: 520;
+
+        }
+
+        .info:hover {
+            box-shadow: 0px 0px 10px 0px black;
+
+        }
+
+
+        .heart {
+            display: flex;
+            justify-content: center;
+
+
+            color: white;
+            font-size: 1em;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 70px;
+
+            border-radius: 20px;
+
+            font-size: 1.2em;
+            text-align: center;
+
+        }
+
+        .winning_rate1 {
+            background-color: ivory;
+            border-radius: 3%;
+            box-shadow: 0px 0px 5px 0px black;
+            width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .comment_write {
+
+            margin-left: auto;
+            margin-right: auto;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            z-index: 2;
+            border: 1px solid black;
+            border-radius: 20px;
+            box-shadow: 0px 0px 5px 0px black;
+        }
+
+        .comment_view {
+            border-radius: 20px;
+
+            background-color: yellow;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            margin-right: auto;
+            margin-left: auto;
+            width: 800px;
+            height: 100px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comment_view2 {
+            border-radius: 20px;
+
+            background-color: yellow;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            margin-right: auto;
+            margin-left: auto;
+            width: 800px;
+            height: 100px;
+            display: none;
+
+        }
+
+        .comment_view:hover {
+            box-shadow: 0px 0px 5px 0px black;
+        }
+
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            winning_rate();
+            show_comment();
+            login_check();
+            show_comments_count()
+        })
+
+        ////////////////////
+        //코멘트API        //
+        ////////////////////
+        function show_comment() {
+            $('#comment-list').empty();
+            $.ajax({
+                type: "GET",
+                url: "/comment",
+                data: {},
+                success: function (response) {
+                    console.log(response['comments'])
+                    console.log(response['token_id'])
+                    let rows = response['comments']
+                    let token_id = response['token_id']
+                    for (let i = 0; i < rows.length; i++) {
+                        if (token_id === rows[i]['userid']) {
+                            let usernick = rows[i]['usernick'];
+                            let comment = rows[i]['comment'];
+                            let comments_date = rows[i]['comments_date'];
+                            let comments_count = rows[i]['comments_count'];
+
+                            let the_present_date = new Date();
+                            let comments_write_time = new Date(comments_date)
+                            let time_comparison = the_present_date.getTime() - comments_write_time.getTime()
+
+                            if ((time_comparison / (1000 * 60)) < 60) {
+                                time = (time_comparison / (1000 * 60))
+                                temp_time = `${parseInt(time)}분 전`
+                            } else if ((time_comparison / (1000 * 60 * 60)) < 24) {
+                                time = (time_comparison / (1000 * 60 * 60))
+                                temp_time = `${parseInt(time)}시간 전`
+                            } else {
+                                time = (time_comparison / (1000 * 60 * 60 * 24))
+                                temp_time = `${parseInt(time)}일 전`
+                            }
+                            let count = i;
+
+
+                            let temp_html = ``
+
+                            temp_html = `<div class="card" style="width: 30rem;background-color: ivory; margin-left: auto; height: auto;overflow: auto;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <div style="display: flex;flex-direction: row;padding: 10px">
+                                                    <div>${usernick}</div>
+                                                    <div style="color: gray;margin-left: 10px;font-size: 0.8em">${temp_time}</div>
+                                                    <div style="margin-left: auto">
+                                                        <button type="button" class="btn btn-outline-light" id="warning${count}"
+                                                                onclick="on_warning(${count})">
+                                                            ❌
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </h5>
+                                            <div style="margin-top: -20px; display: flex;flex-direction: row;">
+                                                <p class="card-text">${comment}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="position: absolute;z-index: 10; width: 350px; margin-top: -120px; display: none;margin-left: 420px;"
+                                                             id="show_warning${count}">
+                                                            <div class="toast${count}">
+                                                                <div class="toast-header" style="background-color: ghostwhite">
+                                                                    <strong class="me-auto">※주의</strong>
+                                                                    <button type="button" class="btn-close"
+                                                                            onclick="off_on_warning(${count})"></button>
+                                                                </div>
+                                                                <div class="toast-body" style="background-color: ghostwhite">
+                                                                    <p>이 댓글을 정말 삭제하시겠습니까?</p>
+                                                                    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                                                                        <button type="button" class="btn btn-outline-danger"
+                                                                                onclick="delete_comment(${count}, ${comments_count})">
+                                                                            삭제
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-outline-dark" style="margin-left: 70px"
+                                                                                onclick="off_on_warning(${count})">닫기
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>`
+
+                            $('#comment-list').append(temp_html)
+
+                        } else {
+                            let usernick = rows[i]['usernick'];
+                            let comment = rows[i]['comment'];
+                            let comments_date = rows[i]['comments_date'];
+                            let comments_count = rows[i]['comments_count'];
+
+                            let the_present_date = new Date();
+                            let comments_write_time = new Date(comments_date)
+                            let time_comparison = the_present_date.getTime() - comments_write_time.getTime()
+
+                            if ((time_comparison / (1000 * 60)) < 60) {
+                                time = (time_comparison / (1000 * 60))
+                                temp_time = `${parseInt(time)}분 전`
+                            } else if ((time_comparison / (1000 * 60 * 60)) < 24) {
+                                time = (time_comparison / (1000 * 60 * 60))
+                                temp_time = `${parseInt(time)}시간 전`
+                            } else {
+                                time = (time_comparison / (1000 * 60 * 60 * 24))
+                                temp_time = `${parseInt(time)}일 전`
+                            }
+                            let count = i;
+
+
+                            let temp_html = ``
+
+                            temp_html = `<div class="card" style="width: 30rem; height: auto;overflow: auto;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <div style="display: flex;flex-direction: row;padding: 10px">
+                                                    <div>${usernick}</div>
+                                                    <div style="color: gray;margin-left: 10px;font-size: 0.8em">${temp_time}</div>
+                                                    <div style="margin-left: auto">
+                                                        <button type="button" class="btn btn-outline-light" id="warning${count}"
+                                                                onclick="delete_comment(${count}, ${comments_count})">
+                                                            ❌
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </h5>
+                                            <div style="margin-top: -20px; display: flex;flex-direction: row;">
+                                                <p class="card-text">${comment}</p>
+                                            </div>
+                                        </div>
+                                    </div>`
+
+                            $('#comment-list').append(temp_html)
+                        }
+                    }
+                }
+            });
+        }
+
+        //삭제 toast창
+        function on_warning(count) {
+            $("#show_warning" + count).fadeIn();
+        }
+
+        function off_on_warning(count) {
+            $("#show_warning" + count).fadeOut();
+        }
+
+        function save_comment() {
+            if ($('#comment').val().length === 0) {
+                alert("댓글을 입력하세요!")
+
+            } else {
+                let comment = $('#comment').val()
+                let comments_date = new Date();
+                $.ajax({
+                    type: "POST",
+                    url: "/comment",
+                    data: {
+                        comment_give: comment,
+                        comments_date_give: comments_date
+                    },
+                    success: function (response) {
+                        if (response['result'] === 'fail') {
+                            alert(response['msg'])
+                            document.getElementById('modal_btn').click();
+                        } else {
+                            show_comment()
+                            $('#comment').val('')
+                        }
+                    }
+                });
+            }
+        }
+
+        //댓글 삭제
+        function delete_comment(count, comments_count) {
+            $("#show_warning" + count).fadeOut();
+            $.ajax({
+                type: "POST",
+                url: "/comment/delete",
+                data: {comments_count: comments_count},
+                success: function (response) {
+                    if (response['msg']) {
+                        alert(response['msg'])
+                    }
+                    show_comment()
+
+                }
+            })
+        }
+
+        //응원수 카운트
+        function show_comments_count() {
+            $('#cheer').empty();
+            $.ajax({
+                type: "GET",
+                url: "/post/Comment_count",
+                data: {},
+                success: function (response) {
+                    console.log(response['comment_count'])
+                    let temp_comments_count = `<h1 class="heart">💕응원 수 : ${response['comment_count']} </h1>`
+                    $('#cheer').append(temp_comments_count)
+                }
+            });
+        }
+
+        /////////////////////
+        //로그인,회원가입   //
+        ////////////////////
+        function login() {
+            $.ajax({
+                type: "POST",
+                url: "/api/login",
+                data: {id_give: $('#userid').val(), pw_give: $('#userpw').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        // 로그인이 정상적으로 되면, 토큰을 받아옵니다.
+                        // 이 토큰을 mytoken이라는 키 값으로 쿠키에 저장합니다.
+
+                        //j쿼리식
+                        $.cookie('mytoken', response['token']);
+                        //js문법식
+                        // document.cookie = 'mytoken=' + response['token'] + ';path=/';
+                        console.log(document.cookie);
+
+                        alert('로그인 완료!')
+                        window.location.href = '/'
+                    } else {
+                        // 로그인이 안되면 에러메시지를 띄웁니다.
+                        alert(response['msg'])
+                    }
+                }
+            })
+        }
+
+        //로그인 확인
+        function login_check() {
+            $.ajax({
+                type: "POST",
+                url: "/login_check",
+                data: {id_give: $('#userid').val(), pw_give: $('#userpw').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        $("#modal_btn").fadeOut();
+                        $("#Logout").fadeIn();
+
+                        $("#comment_view").fadeOut();
+                        $("#comment_view2").fadeIn();
+                    }
+                }
+            })
+        }
+
+        //로그아웃 확인
+        function logout() {
+            $.removeCookie('mytoken');
+            alert('로그아웃!')
+            $("#modal_btn").fadeIn();
+            $("#Logout").fadeOut();
+
+            $("#comment_view").fadeIn();
+            $("#comment_view2").fadeOut();
+            window.location.reload();
+        }
+
+        //ID 이메일 정규식
+        function id_confirm(asValue) {
+            let emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/;
+            return emailRegExp.test(asValue);
+        }
+
+        //비밀번호 숫자/문자/특수문자 조합 8~15자 암호정규식
+        function password_confirm(asValue) {
+            let pwRegExp = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+            return pwRegExp.test(asValue);
+        }
+
+        let OK1 = 'fail';
+        let OK2 = 'fail';
+
+        //ID 중복확인
+        function id_overlap() {
+            let userid = $('#userid_register').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/api/id_overlap",
+                data: {id_give: userid},
+                success: function (response) {
+                    let userid = response['id']
+                    if (response['result'] === 'fail') {
+                        alert('중복된 ID 입니다')
+                        $('#userid_register').val('')
+                    } else if (userid === '' || !id_confirm(userid)) {
+                        alert('사용 불가능한 ID 입니다. 올바른 이메일 형식으로 입력해 주세요')
+                        $('#userid_register').val('')
+                    } else {
+                        alert('사용 가능한 ID 입니다')
+                        OK1 = userid;
+                    }
+                }
+            })
+        }
+
+        //NICKNAME 중복확인
+        function nick_overlap() {
+            let usernick = $('#usernick').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/api/nick_overlap",
+                data: {usernick_give: usernick},
+                success: function (response) {
+                    console.log(response)
+                    let usernick = response['nick']
+                    if (response['result'] === 'fail') {
+                        alert('중복된 닉네임 입니다')
+                        $('#usernick').val('')
+                    } else if (usernick === '') {
+                        alert('사용 불가능한 닉네임 입니다')
+                        $('#usernick').val('')
+                    } else {
+                        alert('사용 가능한 닉네임 입니다')
+                        OK2 = usernick
+                    }
+                }
+            })
+        }
+
+
+        //회원가입 텍스트비우기
+        function empty_1() {
+            $('#userid_register').val('')
+            $('#userpw_register').val('')
+            $('#usernick').val('')
+        }
+
+        // 간단한 회원가입 함수입니다.
+        // 아이디, 비밀번호, 닉네임을 받아 DB에 저장합니다.
+        function register() {
+            if ($('#userid_register').val().length === 0) {
+                alert("ID를 입력하세요!")
+            } else if ($('#userpw_register').val().length === 0) {
+                alert("PW를 입력하세요!")
+            } else if ($('#usernick').val().length === 0) {
+                alert("닉네임을 입력하세요!")
+            } else {
+                let id_register = $('#userid_register').val()
+                let pw_register = $('#userpw_register').val()
+                let nick = $('#usernick').val()
+                if (id_register === '' || !id_confirm(id_register)) {
+                    alert('올바른 이메일 형식으로 입력해주세요')
+                    $('#userid_register').focus()
+                } else if (pw_register === '' || !password_confirm(pw_register)) {
+                    alert('비밀번호를 입력해주세요. 숫자 문자 특수문자 조합 8~15자리')
+                    $('#userpw_register').focus()
+                } else if (OK1 !== id_register) {
+                    alert('ID 중복확인을 해주세요!')
+                } else if (OK2 !== nick) {
+                    alert('닉네임 중복확인을 해주세요!')
+                } else {
+
+
+                    $('#userid_register').val('')
+                    $('#userpw_register').val('')
+                    $('#usernick').val('')
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/register",
+                        data: {
+                            id_give: id_register,
+                            pw_give: pw_register,
+                            nickname_give: nick
+                        },
+                        success: function (response) {
+                            if (response['result'] === 'success') {
+                                alert('회원가입이 완료되었습니다.')
+                                document.getElementById('madal_close').click();
+                                document.getElementById('modal_btn').click();
+                            } else {
+                                alert(response['msg'])
+                            }
+                        }
+                    })
+                }
+            }
+        }
+
+        ////////////////////
+        //승률 투표 API    //
+        ////////////////////
+        function winning_rate() {
+            $('#count12').empty()
+            $.ajax({
+                type: "GET",
+                url: "/winning_rate",
+                data: {},
+                success: function (response) {
+                    console.log(response['winning_rate'])
+                    let rows = response['winning_rate']
+                    for (let i = 0; i < rows.length; i++) {
+                        let korea_image = rows[i]['korea_image'];
+                        let country_name = rows[i]['country_name'];
+                        let country = rows[i]['country'];
+                        let korea = rows[i]['korea'];
+                        let drow = rows[i]['drow'];
+                        let country_image = rows[i]['country_image'];
+                        let korea_value = rows[i]['winning_rate_count_korea'];
+                        let country_value = rows[i]['winning_rate_count_country']
+                        let drow_value = rows[i]['drow_count']
+                        let country_num = rows[i]['country_num']
+                        let max_value = korea_value + country_value + drow_value;
+                        let korea_persent = korea_value / max_value * 100;
+                        let country_persent = country_value / max_value * 100;
+                        let drow_persent = drow_value / max_value * 100;
+
+                        let temp_coumt = `<div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin-top: 10px;margin-bottom: 10px">
+                                            <div style="display: flex; flex-direction: column;margin-right: 10px">
+                                                <img src="${korea_image}">
+                                                <button onclick="increase_korea(${korea},${country_num})" type="button" class="btn btn-primary">korea</button>
+                                            </div>
+                                            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                <div class="progress" style="height: 20px; width: 200px">
+                                                  <div  class="progress-bar progress-bar-striped" role="progressbar" style="width: ${parseInt(korea_persent)}%" aria-valuenow="${korea_value}" aria-valuemin="0" aria-valuemax="${max_value}">${parseInt(korea_persent)}%</div>
+                                                  <div  class="progress-bar progress-bar-striped bg-success" role="progressbar" style=" width: ${parseInt(drow_persent)}%" aria-valuenow="${drow_value}" aria-valuemin="0" aria-valuemax="${max_value}">${parseInt(drow_persent)}%</div>
+                                                  <div  class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: ${parseInt(country_persent)}%" aria-valuenow="${country_value}" aria-valuemin="0" aria-valuemax="${max_value}">${parseInt(country_persent)}%</div>
+                                                </div>
+                                                <button type="button" onclick="increase_drow(${drow},${country_num})" class="btn btn-success">Drow</button>
+                                            </div>
+                                            <div style="display: flex; flex-direction: column;margin-left: 10px">
+                                                <img src="${country_image}">
+                                                <button type="button" onclick="increase_country(${country},${country_num})" class="btn btn-danger">${country_name}</button>
+                                            </div>
+                                        </div>`
+
+                        $('#winning_rate').append(temp_coumt);
+                    }
+                }
+            })
+        }
+
+        function increase_korea(korea, country_num) {
+            console.log(korea, country_num)
+            $.ajax({
+                type: "POST",
+                url: "/winning_rate/increase",
+                data: {'korea_give': korea, 'country_num_give': country_num, 'drow_give': 0, 'country_give': 0},
+                success: function (response) {
+                    alert(response['msg'])
+
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    } else {
+                        window.location.reload()
+                    }
+                },
+            });
+        }
+
+        function increase_drow(drow, country_num) {
+            $.ajax({
+                type: "POST",
+                url: "/winning_rate/increase",
+                data: {'drow_give': drow, 'country_num_give': country_num, 'korea_give': 0, 'country_give': 0},
+                success: function (response) {
+                    alert(response['msg'])
+
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    } else {
+                        window.location.reload()
+                    }
+
+                },
+            });
+        }
+
+        function increase_country(country, country_num) {
+            $.ajax({
+                type: "POST",
+                url: "/winning_rate/increase",
+                data: {'country_give': country, 'country_num_give': country_num, 'korea_give': 0, 'drow_give': 0},
+                success: function (response) {
+                    alert(response['msg'])
+
+                    if (response['result'] === 'fail') {
+                        document.getElementById('modal_btn').click();
+                    } else {
+                        window.location.reload()
+                    }
+                },
+            });
+        }
+
+        ////////////////////
+        //기타 작동스크립트 //
+        ////////////////////
+
+        //스크롤내리기
+        function scroll1() {
+            window.scrollTo(0, document.body.scrollHeight);
+        };
+
+        //로그인창 닫기 후 새로고침
+        function close_reload() {
+            window.location.reload()
+        };
+
+    </script>
+</head>
+<body>
+
+<!--//탑 부분-->
+<div class="mytop">
+
+    <div style="height: 30px;display: flex; flex-direction: column;align-items: end;justify-content: end;">
+        <a class="log" data-bs-toggle="modal" href="#exampleModalToggle" id="modal_btn" role="button"
+           style="display: flex; position: absolute;">Login</a>
+        <a onclick="logout()" class="log" id="Logout" role="button"
+           style="display: none; position: absolute;">Logout</a>
+    </div>
+    <div style="display: flex;flex-direction: column; align-items: center;justify-content: center;">
+        <div>
+            <a href="/playerinfo" type="button" class="info">KR선수단 정보</a>
+        </div>
+    </div>
+    <h1 class="fit">⚽ 2022 카타르 월드컵 화이팅!!</h1>
+    <div id="cheer" style="margin-top: 50px">
+
+    </div>
+</div>
+<!--//경기 승률-->
+<div class="winning_rate1">
+    <div style="color:gray;font-size: x-large;border-bottom: 1px solid gray; margin-bottom: 10px">경기승률 투표해보기</div>
+
+    <div id="winning_rate">
+
+    </div>
+</div>
+
+<!--///코멘트 보기-->
+<div id="comment_view" class="comment_view" type="button" data-bs-toggle="modal"
+     href="#exampleModalToggle">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-fill"
+         viewBox="0 0 16 16">
+        <path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"/>
+    </svg>
+    로그인하고 응원하기!
+</div>
+<div id="comment_view2" class="comment_view2" onclick="scroll1()" type="button">
+    <div class="comment_view" onclick="scroll1()" typeof="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots-fill"
+             viewBox="0 0 16 16">
+            <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+        </svg>
+        응원하기
+    </div>
+</div>
+
+
+<!--코멘트작성란@@@@@@@@@@@@@@@ -->
+<div style="display: flex;flex-direction: column; align-items: center;justify-content: center;">
+    <!--//코멘트-->
+    <div class="mystop" id="comment-list">
+
+
+    </div>
+    <!--//코멘트작성-->
+    <div style="margin-left: auto;margin-right: auto; width:800px; border-top: 2px solid black;margin-bottom: 10px;"></div>
+    <div class="comment_write">
+        <div style="width: 500px;">
+            <div class="input-group mb-3" id="post-box">
+                <input id="comment" class="form-control" placeholder="응원 메시지를 남겨주세요" aria-label="Recipient's username"
+                       aria-describedby="button-addon2">
+                <button style="border-bottom-right-radius: 20px;border-top-right-radius: 20px" onclick="save_comment()"
+                        type="button" id="button-addon2" class="btn btn-outline-dark">응원하기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--로그인, 회원가입-->
+<!-- Modal1 -->
+<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel"
+     tabindex="-1">
+    <!-- Scrollable modal -->
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">로그인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="close_reload()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="section has-text-centered">
+                    <h1 class="title">로그인 페이지</h1>
+                    <div class="container" style="width:60%">
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userid">ID</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" class="input" id="userid" aria-describedby="emailHelp"
+                                               placeholder="My ID">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userpw">PW</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="password" class="input" id="userpw" placeholder="My Password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="button is-primary"
+                                data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
+                                data-bs-dismiss="modal">회원가입
+                        </button>
+                        <button style="margin-left: 40px" class="button is-primary" onclick="login()">로그인</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="close_reload()">Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal2 -->
+<div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel2">회원가입</h5>
+                <button id="madal_close" type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="section has-text-centered">
+                    <h1 class="title">회원가입 페이지</h1>
+                    <div class="container" style="width:100%">
+                        <div class="field is-horizontal">
+
+                            <div class="field-label is-normal">
+                                <label class="label" for="userid">ID</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" class="input" id="userid_register"
+                                               aria-describedby="emailHelp"
+                                               placeholder="이메일 형식으로 입력해주세요">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="field-button"
+                             style="display: flex;flex-direction: column; align-items: end;justify-content: end;">
+                            <button type="button" class="button is-primary"
+                                    style="margin-bottom: 10px;width: 90px;height: 20px;"
+                                    onclick="id_overlap()">ID 중복확인
+                            </button>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="userpw">PW</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="password" class="input" id="userpw_register"
+                                               placeholder="숫자 문자 특수문자 조합 8~15자리">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label" for="usernick">NICKNAME</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input type="text" class="input" id="usernick" placeholder="My Nickname">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div style="display: flex;flex-direction: column; align-items: end;justify-content: end;">
+                            <button type="button" class="button is-primary"
+                                    style="margin-bottom: 10px;width: 90px;height: 20px;" onclick="nick_overlap()">닉네임
+                                확인
+                            </button>
+                        </div>
+                        <button class="button is-primary" onclick="register()">회원가입
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal"
+                        data-bs-dismiss="modal" onclick="empty_1()" type="button">로그인으로 돌아가기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
