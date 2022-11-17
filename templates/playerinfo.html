@@ -30,21 +30,16 @@
             text-decoration-line: none;
             color: inherit;
         }
-        .card-img-top{
+
+        .card-img-top {
             height: 600px;
             width: 100%;
         }
-         .card-box {
-             width: 1500px;
-             margin: 20px auto 0px auto;
-         }
-        input.img-button {
-        background: url( "" ) no-repeat;
-        border: none;
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-      }
+
+        .card-box {
+            width: 1500px;
+            margin: 20px auto 0px auto;
+        }
 
     </style>
 
@@ -60,7 +55,7 @@
                 data: {},
                 success: function (response) {
                     let rows = response['player']
-                    for(let i = 0; i<rows.length; i++){
+                    for (let i = 0; i < rows.length; i++) {
                         let Name = rows[i]['Name']
                         let image = rows[i]['image']
                         let Position = rows[i]['Position']
@@ -96,36 +91,34 @@
             $.ajax({
                 type: "POST",
                 url: "/athlete_like_post",
-                data: {card_number: Card_Number},
+                data: {'card_number': Card_Number},
                 success: function (response) {
                     //그냥 msg 로 완결 여부만 확인해주면 된다.
                     alert(response['msg'])
-                    show_hart(Card_Number)
                     window.location.reload()
 
-                    }
+                }
             })
         }
-
 
 
     </script>
 </head>
 
 <body>
-    <div>
-        <button type="button" class="btn btn-outline-dark" id="home_button" onclick="location.href='';">응원하기</button>
-        <a href="" target="_blank" id="login_Link">Login</a>
+<div>
+    <button type="button" class="btn btn-outline-dark" id="home_button" onclick="location.href='/'">응원하기</button>
+    <a href="" target="_blank" id="login_Link">Login</a>
+</div>
+
+
+<hr>
+<div class="card-box">
+    <div class="row row-cols-1 row-cols-md-4 g-4" id="cards-box">
+
+
     </div>
-
-
-    <hr>
-    <div class="card-box">
-        <div class="row row-cols-1 row-cols-md-4 g-4" id="cards-box">
-
-
-        </div>
-    </div>
+</div>
 
 
 </body>
